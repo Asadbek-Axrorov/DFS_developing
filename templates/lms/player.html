@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.title }} — O'rganish{% endblock %}
+{% block extra_styles %}
+.lms-layout {
+  display: grid; grid-template-columns: 1fr 340px;
+  height: calc(100vh - 70px); overflow: hidden;
+}
+.lms-main { overflow-y: auto; background: #0F172A; }
+.video-wrapper {
+  background: black; position: relative;
+  padding-bottom: 56.25%; height: 0;
+}
+.video-wrapper iframe, .video-wrapper video {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%; border: none;
+}
+.video-placeholder {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 1rem; color: #64748B;
+}
+.video-placeholder .icon { font-size: 4rem; }
+.lesson-info { padding: 2rem; background: white; }
+.lesson-info h1 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; color: var(--dark); margin-bottom: 0.75rem; }
+.lesson-actions { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+.lesson-content { padding: 1.5rem 2rem; background: #F8FAFC; border-top: 1px solid var(--gray-200); }
+.lesson-content p { color: var(--gray-700); line-height: 1.8; }
+
+/* SIDEBAR */
+.lms-sidebar { overflow-y: auto; background: white; border-left: 1px solid var(--gray-200); display: flex; flex-direction: column; }
+.sidebar-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--gray-200); }
+.sidebar-header h3 { font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 0.75rem; line-height: 1.3; }
+.progress-bar-wrap { background: var(--gray-200); border-radius: 10px; height: 6px; }
+.progress-bar-fill { background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 10px; height: 6px; transition: width 0.5s; }
+.progress-text { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--gray-500); margin-top: 0.4rem; }
+.sidebar-modules { flex: 1; overflow-y: auto; }
+.sidebar-module-title {
+  padding: 0.85rem 1.5rem; background: var(--gray-100);
+  font-size: 0.78rem; font-weight: 700; color: var(--gray-600);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sidebar-lesson {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.85rem 1.25rem; cursor: pointer;
+  border-bottom: 1px solid var(--gray-100);
+  text-decoration: none; color: inherit; transition: background 0.2s;
+}
+.sidebar-lesson:hover { background: var(--gray-100); }
+.sidebar-lesson.active { background: var(--primary-light); border-left: 3px solid var(--primary); }
+.sidebar-lesson.completed .lesson-check { background: var(--green); color: white; }
+.lesson-check {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid var(--gray-300); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; transition: all 0.2s;
+}
+.sidebar-lesson.active .lesson-check { border-color: var(--primary); }
+.lesson-name { flex: 1; font-size: 0.82rem; color: var(--gray-700); line-height: 1.3; }
+.sidebar-lesson.active .lesson-name { color: var(--primary); font-weight: 600; }
+.lesson-min { font-size: 0.72rem; color: var(--gray-400); white-space: nowrap; }
+{% endblock %}
+
+{% block content %}
+<div class="lms-layout">
+  <!-- MAIN CONTENT -->
+  <div class="lms-main">
+    {% if current_lesson %}
+      <!-- VIDEO -->
+      <div class="video-wrapper">
+        {% if current_lesson.video_url %}
+          {% if 'youtube.com' in current_lesson.video_url or 'youtu.be' in current_lesson.video_url %}
+            {% with url=current_lesson.video_url %}
+              {% if 'watch?v=' in url %}
+                <iframe src="https://www.youtube.com/embed/{{ url|slice:'url.index("watch?v=")+8:' }}" allowfullscreen></iframe>
+              {% else %}
+                <iframe src="{{ url }}" allowfullscreen></iframe>
+              {% endif %}
+            {% endwith %}
+          {% else %}
+            <iframe src="{{ current_lesson.video_url }}" allowfullscreen></iframe>
+          {% endif %}
+        {% elif current_lesson.video_file %}
+          <video controls>
+            <source src="{{ current_lesson.video_file.url }}" type="video/mp4">
+          </video>
+        {% else %}
+          <div class="video-placeholder">
+            <div class="icon">
+              {% if current_lesson.lesson_type == 'text' %}📝
+              {% elif current_lesson.lesson_type == 'quiz' %}❓
+              {% elif current_lesson.lesson_type == 'task' %}✅
+              {% else %}🎬{% endif %}
+            </div>
+            <div style="font-size:1.1rem;font-weight:600;color:#94A3B8;">{{ current_lesson.get_lesson_type_display }}</div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- LESSON INFO -->
+      <div class="lesson-info">
+        <h1>{{ current_lesson.title }}</h1>
+        <div class="lesson-actions">
+          {% if current_lesson.id not in completed_lessons %}
+            <button onclick="completeLesson({{ current_lesson.id }})" class="btn btn-primary">
+              <i class="fas fa-check"></i> Darsni tugatdim
+            </button>
+          {% else %}
+            <span class="badge badge-green"><i class="fas fa-check-circle"></i> Bajarildi</span>
+          {% endif %}
+          <span class="badge badge-primary">{{ current_lesson.get_lesson_type_display }}</span>
+          {% if current_lesson.duration_minutes %}
+            <span style="color:var(--gray-500);font-size:0.875rem;"><i class="fas fa-clock"></i> {{ current_lesson.duration_minutes }} daqiqa</span>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if current_lesson.content %}
+      <div class="lesson-content">
+        <p>{{ current_lesson.content|linebreaks }}</p>
+      </div>
+      {% endif %}
+    {% else %}
+      <div style="display:flex;align-items:center;justify-content:center;height:60%;color:#64748B;flex-direction:column;gap:1rem;">
+        <div style="font-size:4rem;">📚</div>
+        <h2 style="color:#94A3B8;">Darsni tanlang</h2>
+        <p>Chap tarafdan dars tanlang va o'qishni boshlang</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="lms-sidebar">
+    <div class="sidebar-header">
+      <h3>{{ course.title }}</h3>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" style="width:{{ progress }}%;"></div>
+      </div>
+      <div class="progress-text">
+        <span>Bajarildi</span>
+        <span>{{ progress }}%</span>
+      </div>
+    </div>
+
+    <div class="sidebar-modules">
+      {% for module in modules %}
+        <div class="sidebar-module-title">
+          <span>{{ module.title }}</span>
+          <span style="background:white;padding:2px 8px;border-radius:20px;font-size:0.7rem;">{{ module.lessons.count }}</span>
+        </div>
+        {% for lesson in module.lessons.all %}
+          <a href="?lesson={{ lesson.id }}"
+             class="sidebar-lesson {% if current_lesson.id == lesson.id %}active{% endif %} {% if lesson.id in completed_lessons %}completed{% endif %}">
+            <div class="lesson-check">
+              {% if lesson.id in completed_lessons %}<i class="fas fa-check" style="font-size:9px;"></i>{% endif %}
+            </div>
+            <div class="lesson-name">{{ lesson.title }}</div>
+            {% if lesson.duration_minutes %}
+              <div class="lesson-min">{{ lesson.duration_minutes }}m</div>
+            {% endif %}
+          </a>
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+function completeLesson(lessonId) {
+  fetch('/lms/lesson/' + lessonId + '/complete/', {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': '{{ csrf_token }}',
+      'Content-Type': 'application/json',
+    }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    }
+  });
+}
+</script>
+{% endblock %}

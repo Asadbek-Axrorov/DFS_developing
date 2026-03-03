@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.title }} — SkillMate{% endblock %}
+{% block extra_styles %}
+.course-hero {
+  background: linear-gradient(135deg, #0F172A, #1E1B4B);
+  padding: 4rem 2rem; color: white;
+}
+.course-hero-inner {
+  max-width: 1280px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 380px; gap: 4rem; align-items: start;
+}
+.course-eyebrow { color: #A5B4FC; font-size: 0.8rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1rem; }
+.course-hero h1 { font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem; }
+.course-hero p { color: #94A3B8; font-size: 1rem; line-height: 1.7; margin-bottom: 1.5rem; }
+.course-tags { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.course-meta-row { display: flex; gap: 2rem; color: #94A3B8; font-size: 0.85rem; }
+.enroll-card {
+  background: white; border-radius: 20px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3); position: sticky; top: 90px;
+}
+.enroll-thumb { height: 200px; background: linear-gradient(135deg, var(--primary), var(--secondary)); overflow: hidden; }
+.enroll-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.enroll-thumb-placeholder { width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:5rem; }
+.enroll-body { padding: 1.75rem; }
+.enroll-price { font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: var(--dark); margin-bottom: 1.25rem; }
+.enroll-features { list-style: none; margin-bottom: 1.5rem; }
+.enroll-features li { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; font-size: 0.875rem; color: var(--gray-700); border-bottom: 1px solid var(--gray-100); }
+.enroll-features li:last-child { border-bottom: none; }
+.progress-badge {
+  background: var(--primary-light); border-radius: 12px; padding: 1rem;
+  margin-bottom: 1rem; text-align: center;
+}
+.progress-circle-text { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.course-content { max-width: 1280px; margin: 3rem auto; padding: 0 2rem; }
+.course-grid { display: grid; grid-template-columns: 1fr 380px; gap: 3rem; }
+.content-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+.content-card h3 { font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 1.5rem; }
+.module-item { border: 2px solid var(--gray-100); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; }
+.module-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.25rem; background: var(--gray-100); cursor: pointer;
+  transition: background 0.2s;
+}
+.module-header:hover { background: var(--primary-light); }
+.module-title { font-weight: 700; color: var(--dark); font-size: 0.95rem; }
+.module-lessons-count { font-size: 0.78rem; color: var(--gray-600); background: white; padding: 0.25rem 0.75rem; border-radius: 50px; }
+.module-body { padding: 0.5rem; }
+.lesson-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1rem; border-radius: 8px; transition: background 0.2s;
+}
+.lesson-item:hover { background: var(--gray-100); }
+.lesson-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+.lesson-title { flex: 1; font-size: 0.875rem; color: var(--gray-700); }
+.lesson-duration { font-size: 0.75rem; color: var(--gray-400); }
+.review-item { padding: 1.25rem 0; border-bottom: 1px solid var(--gray-100); }
+.review-item:last-child { border-bottom: none; }
+.review-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; }
+.reviewer-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--primary); }
+.reviewer-name { font-weight: 600; font-size: 0.875rem; }
+.stars { color: #F59E0B; font-size: 0.85rem; }
+.review-text { font-size: 0.875rem; color: var(--gray-600); line-height: 1.6; }
+{% endblock %}
+
+{% block content %}
+<div class="course-hero">
+  <div class="course-hero-inner">
+    <div>
+      {% if course.category %}
+        <div class="course-eyebrow">{{ course.category.icon }} {{ course.category.name }}</div>
+      {% endif %}
+      <h1>{{ course.title }}</h1>
+      <p>{{ course.short_description }}</p>
+      <div class="course-tags">
+        <span class="badge badge-primary">{{ course.get_level_display }}</span>
+        <span class="badge" style="background:rgba(255,255,255,0.15);color:white;">{{ course.get_language_display }}</span>
+        {% if course.is_free %}
+          <span class="badge badge-green">Bepul kurs</span>
+        {% endif %}
+      </div>
+      <div class="course-meta-row">
+        {% if course.mentor %}<span>👨‍🏫 {{ course.mentor.get_full_name|default:course.mentor.username }}</span>{% endif %}
+        <span>👥 {{ course.students_count }} talaba</span>
+        <span>⏱️ {{ course.duration_hours }} soat</span>
+        <span>★ {{ course.rating|floatformat:1 }}</span>
+      </div>
+    </div>
+
+    <!-- ENROLL CARD -->
+    <div class="enroll-card">
+      <div class="enroll-thumb">
+        {% if course.thumbnail %}<img src="{{ course.thumbnail.url }}" alt="">
+        {% else %}
+          <div class="enroll-thumb-placeholder">
+            {% if 'ingliz' in course.title|lower %}🇬🇧
+            {% elif 'rus' in course.title|lower %}🇷🇺
+            {% elif 'matema' in course.title|lower %}📐
+            {% elif 'fizika' in course.title|lower %}⚛️
+            {% else %}📚{% endif %}
+          </div>
+        {% endif %}
+      </div>
+      <div class="enroll-body">
+        {% if is_enrolled and enrollment %}
+          <div class="progress-badge">
+            <div class="progress-circle-text">{{ enrollment.progress }}%</div>
+            <div style="font-size:0.8rem;color:var(--gray-600);">Kurs davomi</div>
+            <div style="background:var(--gray-200);border-radius:10px;height:6px;margin-top:0.75rem;">
+              <div style="width:{{ enrollment.progress }}%;background:var(--primary);border-radius:10px;height:6px;transition:width 0.5s;"></div>
+            </div>
+          </div>
+          <a href="{% url 'lms:course' course.slug %}" class="btn btn-primary" style="width:100%;justify-content:center;padding:1rem;font-size:1rem;">
+            <i class="fas fa-play-circle"></i> Davom etish
+          </a>
+        {% else %}
+          <div class="enroll-price">
+            {% if course.is_free %}Bepul{% else %}{{ course.price|floatformat:0 }} so'm{% endif %}
+          </div>
+          <ul class="enroll-features">
+            <li><i class="fas fa-video" style="color:var(--primary);width:16px;"></i> Video darslar</li>
+            <li><i class="fas fa-infinity" style="color:var(--green);width:16px;"></i> Cheksiz kirish</li>
+            <li><i class="fas fa-certificate" style="color:var(--accent);width:16px;"></i> Sertifikat</li>
+            <li><i class="fas fa-mobile-alt" style="color:var(--secondary);width:16px;"></i> Mobil qurilmada</li>
+          </ul>
+          {% if user.is_authenticated %}
+            <a href="{% url 'courses:enroll' course.slug %}" class="btn btn-primary" style="width:100%;justify-content:center;padding:1rem;font-size:1rem;">
+              <i class="fas fa-graduation-cap"></i> Kursga yozilish
+            </a>
+          {% else %}
+            <a href="{% url 'accounts:login' %}" class="btn btn-primary" style="width:100%;justify-content:center;padding:1rem;font-size:1rem;">
+              <i class="fas fa-sign-in-alt"></i> Kursga yozilish uchun kiring
+            </a>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="course-content">
+  <div class="course-grid">
+    <div>
+      <!-- ABOUT -->
+      <div class="content-card">
+        <h3>📋 Kurs haqida</h3>
+        <p style="color:var(--gray-600);line-height:1.8;">{{ course.description }}</p>
+      </div>
+
+      <!-- CURRICULUM -->
+      {% if modules %}
+      <div class="content-card">
+        <h3>📚 O'quv dasturi</h3>
+        {% for module in modules %}
+        <div class="module-item">
+          <div class="module-header" onclick="toggleModule({{ module.id }})">
+            <div class="module-title">📁 {{ module.title }}</div>
+            <span class="module-lessons-count">{{ module.lessons.count }} dars</span>
+          </div>
+          <div class="module-body" id="module-{{ module.id }}" style="display:none;">
+            {% for lesson in module.lessons.all %}
+            <div class="lesson-item">
+              {% if lesson.lesson_type == 'video' %}
+                <div class="lesson-icon" style="background:#EEF2FF;color:var(--primary);">🎬</div>
+              {% elif lesson.lesson_type == 'text' %}
+                <div class="lesson-icon" style="background:#ECFDF5;color:var(--green);">📝</div>
+              {% elif lesson.lesson_type == 'quiz' %}
+                <div class="lesson-icon" style="background:#FFFBEB;color:var(--accent);">❓</div>
+              {% else %}
+                <div class="lesson-icon" style="background:#FEF2F2;color:var(--red);">✅</div>
+              {% endif %}
+              <div class="lesson-title">{{ lesson.title }}</div>
+              <div class="lesson-duration">{{ lesson.duration_minutes }} min</div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- REVIEWS -->
+      {% if reviews %}
+      <div class="content-card">
+        <h3>⭐ Sharhlar</h3>
+        {% for review in reviews %}
+        <div class="review-item">
+          <div class="review-header">
+            <div class="reviewer-avatar">{{ review.student.first_name|first|default:review.student.username|first|upper }}</div>
+            <div>
+              <div class="reviewer-name">{{ review.student.get_full_name|default:review.student.username }}</div>
+              <div class="stars">{{ review.rating }}★</div>
+            </div>
+          </div>
+          <div class="review-text">{{ review.comment }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- MENTOR INFO -->
+    <div>
+      {% if course.mentor %}
+      <div class="content-card">
+        <h3>👨‍🏫 Mentor</h3>
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+          <div style="width:56px;height:56px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;color:white;font-size:1.5rem;font-weight:700;flex-shrink:0;">
+            {% if course.mentor.avatar %}
+              <img src="{{ course.mentor.avatar.url }}" style="width:56px;height:56px;border-radius:50%;object-fit:cover;">
+            {% else %}
+              {{ course.mentor.first_name|first|default:course.mentor.username|first|upper }}
+            {% endif %}
+          </div>
+          <div>
+            <div style="font-weight:700;color:var(--dark);">{{ course.mentor.get_full_name|default:course.mentor.username }}</div>
+            <div style="color:var(--gray-600);font-size:0.8rem;">Mentor · SkillMate</div>
+          </div>
+        </div>
+        {% if course.mentor.bio %}
+          <p style="color:var(--gray-600);font-size:0.875rem;line-height:1.7;">{{ course.mentor.bio }}</p>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% if course.curator %}
+      <div class="content-card">
+        <h3>🎯 Kurator</h3>
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <div style="width:44px;height:44px;border-radius:50%;background:#FFFBEB;display:flex;align-items:center;justify-content:center;color:#D97706;font-weight:700;">
+            {{ course.curator.first_name|first|default:course.curator.username|first|upper }}
+          </div>
+          <div>
+            <div style="font-weight:700;color:var(--dark);">{{ course.curator.get_full_name|default:course.curator.username }}</div>
+            <div style="color:var(--gray-600);font-size:0.8rem;">Kurator</div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleModule(id) {
+  const el = document.getElementById('module-' + id);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+// Open first module by default
+document.addEventListener('DOMContentLoaded', function() {
+  const first = document.querySelector('.module-body');
+  if (first) first.style.display = 'block';
+});
+</script>
+{% endblock %}

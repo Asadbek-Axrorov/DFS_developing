@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}Mentorlar — Kurator{% endblock %}
+{% block extra_styles %}
+.page { max-width: 1100px; margin: 2rem auto; padding: 0 2rem; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.page-header h1 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; }
+.back-nav { font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem; }
+.back-nav a { color: var(--primary); text-decoration: none; }
+.mentors-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+.mentor-card { background: white; border-radius: 16px; padding: 1.75rem; box-shadow: var(--shadow); transition: all 0.3s; }
+.mentor-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.mentor-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; }
+.mentor-avatar { width: 56px; height: 56px; border-radius: 50%; background: #ECFDF5; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700; color: #059669; flex-shrink: 0; }
+.mentor-name { font-family: var(--font-display); font-weight: 700; color: var(--dark); }
+.mentor-email { font-size: 0.78rem; color: var(--gray-500); }
+.mentor-courses { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-100); }
+.mentor-courses h5 { font-size: 0.78rem; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.6rem; }
+.mentor-course-item { font-size: 0.82rem; color: var(--gray-700); padding: 0.4rem 0; border-bottom: 1px solid var(--gray-100); display: flex; justify-content: space-between; }
+.mentor-course-item:last-child { border-bottom: none; }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="back-nav"><a href="{% url 'dashboard:home' %}">← Dashboard</a></div>
+  <div class="page-header">
+    <h1>👨‍🏫 Mentorlar</h1>
+    <span class="badge badge-green">{{ mentors.count }} mentor</span>
+  </div>
+
+  <div class="mentors-grid">
+    {% for mentor in mentors %}
+    <div class="mentor-card">
+      <div class="mentor-header">
+        {% if mentor.avatar %}
+          <img src="{{ mentor.avatar.url }}" class="mentor-avatar" style="object-fit:cover;">
+        {% else %}
+          <div class="mentor-avatar">{{ mentor.first_name|first|default:mentor.username|first|upper }}</div>
+        {% endif %}
+        <div>
+          <div class="mentor-name">{{ mentor.get_full_name|default:mentor.username }}</div>
+          <div class="mentor-email">{{ mentor.email }}</div>
+          {% if mentor.telegram %}<div style="font-size:0.75rem;color:var(--primary);">@{{ mentor.telegram }}</div>{% endif %}
+        </div>
+      </div>
+      {% if mentor.bio %}
+        <p style="font-size:0.82rem;color:var(--gray-600);line-height:1.6;margin-bottom:1rem;">{{ mentor.bio|truncatechars:100 }}</p>
+      {% endif %}
+      <div class="mentor-courses">
+        <h5>📚 Kurslar ({{ mentor.teaching_courses.count }})</h5>
+        {% for course in mentor.teaching_courses.all|slice:":3" %}
+          <div class="mentor-course-item">
+            <span>{{ course.title }}</span>
+            {% if course.is_published %}<span class="badge badge-green" style="padding:0.15rem 0.5rem;font-size:0.65rem;">Nashr</span>{% endif %}
+          </div>
+        {% empty %}
+          <div style="color:var(--gray-400);font-size:0.8rem;">Kurs yo'q</div>
+        {% endfor %}
+      </div>
+      <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+        <span style="font-size:0.78rem;color:var(--gray-500);">
+          <i class="fas fa-check-circle" style="color:{% if mentor.is_verified %}var(--green){% else %}var(--gray-300){% endif %};"></i>
+          {% if mentor.is_verified %}Tasdiqlangan{% else %}Tasdiqlanmagan{% endif %}
+        </span>
+      </div>
+    </div>
+    {% empty %}
+    <div style="grid-column:span 3;text-align:center;padding:4rem;color:var(--gray-400);">
+      <div style="font-size:3rem;margin-bottom:1rem;">👨‍🏫</div>
+      <p>Mentorlar yo'q</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

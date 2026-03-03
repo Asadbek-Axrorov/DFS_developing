@@ -1,0 +1,428 @@
+{% extends 'base.html' %}
+{% block title %}SkillMate — Online Ta'lim Platformasi{% endblock %}
+
+{% block extra_styles %}
+.hero {
+  background: linear-gradient(135deg, #0F172A 0%, #1E1B4B 50%, #312E81 100%);
+  padding: 7rem 2rem 8rem;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -50%; right: -20%;
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(79,70,229,0.3) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute; bottom: -30%; left: -10%;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-inner {
+  max-width: 1280px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 4rem; align-items: center; position: relative; z-index: 1;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: rgba(79,70,229,0.3); border: 1px solid rgba(79,70,229,0.5);
+  color: #A5B4FC; padding: 0.4rem 1rem; border-radius: 50px;
+  font-size: 0.8rem; font-weight: 600; letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 1.5rem;
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 3.8rem);
+  font-weight: 800; color: white; line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+.hero h1 .gradient-text {
+  background: linear-gradient(135deg, #818CF8, #06B6D4);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.hero p {
+  color: #94A3B8; font-size: 1.1rem; line-height: 1.8;
+  margin-bottom: 2.5rem; max-width: 480px;
+}
+.hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+.hero-stats {
+  display: flex; gap: 2rem; margin-top: 3rem;
+  padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1);
+}
+.hero-stat-num {
+  font-family: var(--font-display);
+  font-size: 1.8rem; font-weight: 800; color: white;
+}
+.hero-stat-label { color: #64748B; font-size: 0.8rem; margin-top: 2px; }
+
+.hero-visual {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.hero-card {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  transition: all 0.3s;
+}
+.hero-card:hover {
+  background: rgba(255,255,255,0.12);
+  transform: translateY(-4px);
+}
+.hero-card-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 1rem;
+}
+.hero-card h3 {
+  color: white; font-family: var(--font-display);
+  font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem;
+}
+.hero-card p { color: #64748B; font-size: 0.8rem; }
+.hero-card .students {
+  display: flex; align-items: center; gap: 0.5rem;
+  margin-top: 1rem; color: #94A3B8; font-size: 0.75rem;
+}
+
+/* COURSES GRID */
+.courses-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+.course-card {
+  background: white; border-radius: var(--radius);
+  overflow: hidden; transition: all 0.3s;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  cursor: pointer;
+}
+.course-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+.course-thumb {
+  height: 180px; position: relative; overflow: hidden;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+.course-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.course-thumb-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 4rem;
+}
+.course-badge {
+  position: absolute; top: 1rem; left: 1rem;
+}
+.course-body { padding: 1.25rem; }
+.course-category {
+  font-size: 0.75rem; font-weight: 700; color: var(--primary);
+  text-transform: uppercase; letter-spacing: 1px;
+  margin-bottom: 0.5rem;
+}
+.course-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem; font-weight: 700; color: var(--dark);
+  line-height: 1.3; margin-bottom: 0.6rem;
+}
+.course-mentor { font-size: 0.8rem; color: var(--gray-600); margin-bottom: 1rem; }
+.course-meta {
+  display: flex; justify-content: space-between;
+  align-items: center; padding-top: 1rem;
+  border-top: 1px solid var(--gray-100);
+}
+.course-rating { color: #F59E0B; font-size: 0.85rem; font-weight: 600; }
+.course-students { color: var(--gray-400); font-size: 0.8rem; }
+.course-price {
+  font-family: var(--font-display);
+  font-weight: 800; color: var(--primary); font-size: 1.1rem;
+}
+.course-free {
+  background: #ECFDF5; color: #065F46;
+  padding: 0.3rem 0.8rem; border-radius: 50px;
+  font-size: 0.75rem; font-weight: 700;
+}
+
+/* FEATURES */
+.features-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+}
+.feature-card {
+  text-align: center; padding: 2.5rem 2rem;
+  border-radius: var(--radius); transition: all 0.3s;
+}
+.feature-card:hover { transform: translateY(-4px); }
+.feature-icon {
+  width: 72px; height: 72px; border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; margin: 0 auto 1.5rem;
+}
+.feature-card h3 {
+  font-family: var(--font-display); font-size: 1.1rem;
+  font-weight: 700; color: var(--dark); margin-bottom: 0.75rem;
+}
+.feature-card p { color: var(--gray-600); font-size: 0.9rem; line-height: 1.7; }
+
+/* CTA */
+.cta-section {
+  background: linear-gradient(135deg, var(--primary), #7C3AED);
+  padding: 5rem 2rem; text-align: center; position: relative; overflow: hidden;
+}
+.cta-section::before {
+  content: '';
+  position: absolute; top: -50%; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 800px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+}
+.cta-section h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-weight: 800; color: white; margin-bottom: 1rem; position: relative;
+}
+.cta-section p { color: rgba(255,255,255,0.8); font-size: 1.05rem; margin-bottom: 2rem; position: relative; }
+
+/* CATEGORIES TABS */
+.cat-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.cat-tab {
+  padding: 0.5rem 1.25rem; border-radius: 50px;
+  background: white; border: 2px solid var(--gray-200);
+  color: var(--gray-600); font-weight: 600; font-size: 0.85rem;
+  cursor: pointer; transition: all 0.2s; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+}
+.cat-tab:hover, .cat-tab.active {
+  background: var(--primary); border-color: var(--primary); color: white;
+}
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">
+        <span>⚡</span> O'zbekistoning #1 Ta'lim Platformasi
+      </div>
+      <h1>Bilim — <span class="gradient-text">Muvaffaqiyat</span> kaliti</h1>
+      <p>SkillMate bilan ingliz tili, rus tili, matematika va fizikani professional mentorlardan o'rganing. O'z sur'atingizda, o'z vaqtingizda.</p>
+      <div class="hero-btns">
+        <a href="{% url 'courses:list' %}" class="btn btn-primary btn-lg">
+          <i class="fas fa-play-circle"></i> Kurslarni ko'rish
+        </a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-white btn-lg">
+          Bepul boshlash →
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num">{{ stats.courses }}+</div>
+          <div class="hero-stat-label">Kurslar</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">{{ stats.students }}+</div>
+          <div class="hero-stat-label">Talabalar</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">{{ stats.mentors }}+</div>
+          <div class="hero-stat-label">Mentorlar</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card" style="grid-column: span 2;">
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <div class="hero-card-icon" style="background:rgba(79,70,229,0.2);">🇬🇧</div>
+          <div>
+            <div style="color:white;font-weight:700;">Ingliz tili kursi</div>
+            <div style="color:#64748B;font-size:0.8rem;">A1 dan C1 gacha</div>
+          </div>
+          <span class="badge badge-green" style="margin-left:auto;">Yangi</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-icon" style="background:rgba(6,182,212,0.2);">🇷🇺</div>
+        <h3>Rus tili</h3>
+        <p>Boshlang'ichdan</p>
+        <div class="students">👥 120+ talaba</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-icon" style="background:rgba(245,158,11,0.2);">📐</div>
+        <h3>Matematika</h3>
+        <p>Algebra & Geometriya</p>
+        <div class="students">👥 85+ talaba</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-icon" style="background:rgba(239,68,68,0.2);">⚛️</div>
+        <h3>Fizika</h3>
+        <p>Mexanika & Optika</p>
+        <div class="students">👥 60+ talaba</div>
+      </div>
+      <div class="hero-card" style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.5rem;">
+        <div style="font-size:2rem;">🏆</div>
+        <div style="color:white;font-weight:700;font-size:0.9rem;">4.9★ Reyting</div>
+        <div style="color:#64748B;font-size:0.75rem;">500+ sharh</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED COURSES -->
+{% if featured_courses %}
+<section class="section" style="background:white;">
+  <div class="container">
+    <div class="section-header">
+      <div class="eyebrow">⭐ Tavsiya etilgan</div>
+      <h2>Mashhur Kurslar</h2>
+      <p>Minglab talabalar ishongan eng sifatli kurslarimiz</p>
+    </div>
+
+    <div class="courses-grid">
+      {% for course in featured_courses %}
+      <a href="{% url 'courses:detail' course.slug %}" style="text-decoration:none;">
+        <div class="course-card">
+          <div class="course-thumb">
+            {% if course.thumbnail %}
+              <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}">
+            {% else %}
+              <div class="course-thumb-placeholder">
+                {% if 'ingliz' in course.title|lower %}🇬🇧
+                {% elif 'rus' in course.title|lower %}🇷🇺
+                {% elif 'matema' in course.title|lower %}📐
+                {% elif 'fizika' in course.title|lower %}⚛️
+                {% else %}📚{% endif %}
+              </div>
+            {% endif %}
+            {% if course.is_free %}
+              <div class="course-badge"><span class="course-free">BEPUL</span></div>
+            {% endif %}
+          </div>
+          <div class="course-body">
+            {% if course.category %}
+              <div class="course-category">{{ course.category.icon }} {{ course.category.name }}</div>
+            {% endif %}
+            <div class="course-title">{{ course.title }}</div>
+            {% if course.mentor %}
+              <div class="course-mentor">👨‍🏫 {{ course.mentor.get_full_name|default:course.mentor.username }}</div>
+            {% endif %}
+            <div class="course-meta">
+              <div class="course-rating">★ {{ course.rating|floatformat:1 }}</div>
+              <div class="course-students">{{ course.students_count }} talaba</div>
+              {% if course.is_free %}
+                <span class="course-free">Bepul</span>
+              {% else %}
+                <div class="course-price">{{ course.price|floatformat:0 }} so'm</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+
+    <div style="text-align:center;margin-top:3rem;">
+      <a href="{% url 'courses:list' %}" class="btn btn-primary btn-lg">
+        Barcha kurslarni ko'rish <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ALL COURSES -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div class="eyebrow">📚 Katalog</div>
+      <h2>Barcha Kurslar</h2>
+      <p>O'z manfaatingizga mos kursni toping</p>
+    </div>
+
+    <div class="cat-tabs">
+      <a href="{% url 'courses:list' %}" class="cat-tab active">Barchasi</a>
+      {% for cat in categories %}
+        <a href="{% url 'courses:list' %}?category={{ cat.slug }}" class="cat-tab">{{ cat.icon }} {{ cat.name }}</a>
+      {% endfor %}
+    </div>
+
+    <div class="courses-grid">
+      {% for course in all_courses %}
+      <a href="{% url 'courses:detail' course.slug %}" style="text-decoration:none;">
+        <div class="course-card">
+          <div class="course-thumb">
+            {% if course.thumbnail %}
+              <img src="{{ course.thumbnail.url }}" alt="">
+            {% else %}
+              <div class="course-thumb-placeholder">
+                {% if 'ingliz' in course.title|lower %}🇬🇧
+                {% elif 'rus' in course.title|lower %}🇷🇺
+                {% elif 'matema' in course.title|lower %}📐
+                {% elif 'fizika' in course.title|lower %}⚛️
+                {% else %}📚{% endif %}
+              </div>
+            {% endif %}
+          </div>
+          <div class="course-body">
+            {% if course.category %}
+              <div class="course-category">{{ course.category.icon }} {{ course.category.name }}</div>
+            {% endif %}
+            <div class="course-title">{{ course.title }}</div>
+            {% if course.mentor %}
+              <div class="course-mentor">👨‍🏫 {{ course.mentor.get_full_name|default:course.mentor.username }}</div>
+            {% endif %}
+            <div class="course-meta">
+              <div class="course-rating">★ {{ course.rating|floatformat:1 }}</div>
+              <div class="course-students">{{ course.students_count }} talaba</div>
+              {% if course.is_free %}
+                <span class="course-free">Bepul</span>
+              {% else %}
+                <div class="course-price">{{ course.price|floatformat:0 }} so'm</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" style="background:white;">
+  <div class="container">
+    <div class="section-header">
+      <div class="eyebrow">✨ Nima uchun SkillMate?</div>
+      <h2>Sizga kerak bo'lgan hamma narsa</h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card" style="background:var(--primary-light);">
+        <div class="feature-icon" style="background:var(--primary);color:white;">🎬</div>
+        <h3>Video darslar</h3>
+        <p>HD sifatli video darslar, istalgan vaqtda, istalgan qurilmada tomosha qiling</p>
+      </div>
+      <div class="feature-card" style="background:#ECFDF5;">
+        <div class="feature-icon" style="background:var(--green);color:white;">🏆</div>
+        <h3>Sertifikatlar</h3>
+        <p>Kursni tugatgach, rasmiy sertifikat oling va uni karyerangizda ishlating</p>
+      </div>
+      <div class="feature-card" style="background:#FFFBEB;">
+        <div class="feature-icon" style="background:var(--accent);color:white;">👨‍🏫</div>
+        <h3>Tajribali Mentorlar</h3>
+        <p>Sohadagi eng yaxshi mutaxassislardan to'g'ridan-to'g'ri o'rganing</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container" style="position:relative;z-index:1;">
+    <h2>Bugun boshlang, bepul!</h2>
+    <p>1000+ talabalar bilan qo'shiling va o'z imkoniyatlaringizni kashf eting</p>
+    <a href="{% url 'accounts:register' %}" class="btn btn-white btn-lg">
+      Bepul ro'yxatdan o'tish <i class="fas fa-arrow-right"></i>
+    </a>
+  </div>
+</section>
+
+{% endblock %}

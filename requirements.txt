@@ -1,0 +1,6 @@
+# Python 3.14 uchun Django 5.1+ kerak
+Django>=5.1
+
+# Pillow - rasm uchun (ixtiyoriy)
+# Python 3.14 uchun: pip install --pre Pillow
+# Python 3.12 va past: pip install Pillow

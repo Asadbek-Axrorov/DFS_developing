@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Ro'yxatdan o'tish — SkillMate{% endblock %}
+{% block extra_styles %}
+.auth-page {
+  min-height: calc(100vh - 70px);
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #F0F4FF 0%, #EDE9FE 100%);
+  padding: 2rem;
+}
+.auth-card {
+  background: white; border-radius: 24px;
+  padding: 3rem; width: 100%; max-width: 480px;
+  box-shadow: 0 20px 60px rgba(79,70,229,0.15);
+}
+.auth-logo { text-align: center; margin-bottom: 2rem; }
+.auth-logo .icon {
+  width: 64px; height: 64px; background: var(--primary);
+  border-radius: 18px; margin: 0 auto 1rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+}
+.auth-logo h1 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: var(--dark); }
+.auth-logo p { color: var(--gray-600); font-size: 0.9rem; margin-top: 0.25rem; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group { margin-bottom: 1.1rem; }
+.form-label { display: block; font-weight: 600; font-size: 0.875rem; color: var(--gray-700); margin-bottom: 0.5rem; }
+.form-input {
+  width: 100%; padding: 0.8rem 1rem;
+  border: 2px solid var(--gray-200); border-radius: 12px;
+  font-family: var(--font-body); font-size: 0.9rem; color: var(--dark);
+  transition: all 0.2s; outline: none;
+}
+.form-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(79,70,229,0.1); }
+.form-input-icon { position: relative; }
+.form-input-icon .form-input { padding-left: 2.75rem; }
+.form-input-icon .icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--gray-400); }
+.btn-full { width: 100%; justify-content: center; padding: 0.9rem; font-size: 1rem; }
+.auth-footer { text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--gray-600); }
+.auth-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="icon">🎓</div>
+      <h1>SkillMate</h1>
+      <p>Yangi hisob yarating</p>
+    </div>
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ism</label>
+          <input type="text" name="first_name" class="form-input" placeholder="Isming" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Familiya</label>
+          <input type="text" name="last_name" class="form-input" placeholder="Familiyangiz" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Foydalanuvchi nomi</label>
+        <div class="form-input-icon">
+          <i class="fas fa-user icon"></i>
+          <input type="text" name="username" class="form-input" placeholder="username" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <div class="form-input-icon">
+          <i class="fas fa-envelope icon"></i>
+          <input type="email" name="email" class="form-input" placeholder="email@example.com">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Parol</label>
+          <input type="password" name="password" class="form-input" placeholder="••••••••" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Parolni takrorlang</label>
+          <input type="password" name="password2" class="form-input" placeholder="••••••••" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:0.5rem;">
+        <i class="fas fa-user-plus"></i> Ro'yxatdan o'tish
+      </button>
+    </form>
+    <div class="auth-footer">
+      Hisobingiz bormi? <a href="{% url 'accounts:login' %}">Kiring</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

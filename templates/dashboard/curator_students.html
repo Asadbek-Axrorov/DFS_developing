@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Talabalar — Kurator{% endblock %}
+{% block extra_styles %}
+.page { max-width: 1100px; margin: 2rem auto; padding: 0 2rem; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.page-header h1 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; }
+.back-nav { font-size: 0.875rem; color: var(--gray-500); margin-bottom: 0.5rem; }
+.back-nav a { color: var(--primary); text-decoration: none; }
+.students-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; }
+.student-card { background: white; border-radius: 14px; padding: 1.5rem; box-shadow: var(--shadow); transition: all 0.3s; }
+.student-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.student-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 1rem; }
+.student-name { font-family: var(--font-display); font-weight: 700; color: var(--dark); margin-bottom: 0.25rem; }
+.student-email { font-size: 0.8rem; color: var(--gray-500); margin-bottom: 1rem; }
+.student-stats { display: flex; gap: 1.5rem; }
+.student-stat { font-size: 0.8rem; }
+.student-stat strong { display: block; font-family: var(--font-display); font-size: 1.1rem; font-weight: 700; color: var(--dark); }
+.student-stat span { color: var(--gray-500); }
+{% endblock %}
+
+{% block content %}
+<div class="page">
+  <div class="back-nav"><a href="{% url 'dashboard:home' %}">← Dashboard</a></div>
+  <div class="page-header">
+    <h1>👥 Talabalar</h1>
+    <span class="badge badge-primary">{{ students.count }} talaba</span>
+  </div>
+
+  <div class="students-grid">
+    {% for student in students %}
+    <div class="student-card">
+      {% if student.avatar %}
+        <img src="{{ student.avatar.url }}" class="student-avatar" style="object-fit:cover;">
+      {% else %}
+        <div class="student-avatar">{{ student.first_name|first|default:student.username|first|upper }}</div>
+      {% endif %}
+      <div class="student-name">{{ student.get_full_name|default:student.username }}</div>
+      <div class="student-email">{{ student.email|default:student.username }}</div>
+      <div class="student-stats">
+        <div class="student-stat">
+          <strong>{{ student.enrollments.count }}</strong>
+          <span>Kurslar</span>
+        </div>
+        <div class="student-stat">
+          <strong>{{ student.enrollments.filter.count|default:"0" }}</strong>
+          <span>Tugat.</span>
+        </div>
+        <div class="student-stat">
+          <strong>{% if student.is_verified %}✅{% else %}⏳{% endif %}</strong>
+          <span>Holat</span>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div style="grid-column:span 4;text-align:center;padding:4rem;color:var(--gray-400);">
+      <div style="font-size:3rem;margin-bottom:1rem;">👥</div>
+      <p>Talabalar yo'q</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

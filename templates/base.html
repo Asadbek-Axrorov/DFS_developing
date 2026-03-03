@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}SkillMate — Online Ta'lim Platformasi{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+{% load static %}
+<style>
+:root {
+  --primary: #4F46E5;
+  --primary-dark: #3730A3;
+  --primary-light: #EEF2FF;
+  --secondary: #06B6D4;
+  --accent: #F59E0B;
+  --green: #10B981;
+  --red: #EF4444;
+  --dark: #0F172A;
+  --gray-900: #111827;
+  --gray-800: #1F2937;
+  --gray-700: #374151;
+  --gray-600: #4B5563;
+  --gray-400: #9CA3AF;
+  --gray-200: #E5E7EB;
+  --gray-100: #F3F4F6;
+  --white: #FFFFFF;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --radius: 16px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(79,70,229,0.10);
+  --shadow-md: 0 8px 40px rgba(79,70,229,0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  color: var(--gray-800);
+  background: #FAFAFA;
+  line-height: 1.6;
+}
+
+/* NAVBAR */
+.navbar {
+  position: sticky; top: 0; z-index: 1000;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--gray-200);
+  padding: 0 2rem;
+}
+.nav-inner {
+  max-width: 1280px; margin: 0 auto;
+  display: flex; align-items: center;
+  height: 70px; gap: 2rem;
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 1.5rem; font-weight: 800;
+  color: var(--primary); text-decoration: none;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.nav-logo span { color: var(--dark); }
+.nav-logo-icon {
+  width: 36px; height: 36px;
+  background: var(--primary);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-size: 18px;
+}
+.nav-links { display: flex; gap: 0.25rem; flex: 1; }
+.nav-links a {
+  text-decoration: none; color: var(--gray-600);
+  padding: 0.5rem 1rem; border-radius: var(--radius-sm);
+  font-weight: 500; font-size: 0.9rem;
+  transition: all 0.2s;
+}
+.nav-links a:hover, .nav-links a.active {
+  background: var(--primary-light); color: var(--primary);
+}
+.nav-actions { display: flex; align-items: center; gap: 0.75rem; margin-left: auto; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.6rem 1.4rem; border-radius: 50px;
+  font-family: var(--font-body); font-weight: 600;
+  font-size: 0.875rem; cursor: pointer;
+  text-decoration: none; border: none;
+  transition: all 0.25s; white-space: nowrap;
+}
+.btn-primary {
+  background: var(--primary); color: white;
+  box-shadow: 0 4px 15px rgba(79,70,229,0.35);
+}
+.btn-primary:hover {
+  background: var(--primary-dark); transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(79,70,229,0.45);
+}
+.btn-outline {
+  background: transparent; color: var(--primary);
+  border: 2px solid var(--primary);
+}
+.btn-outline:hover { background: var(--primary-light); }
+.btn-white {
+  background: white; color: var(--primary);
+  box-shadow: var(--shadow);
+}
+.btn-white:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.btn-sm { padding: 0.4rem 1rem; font-size: 0.8rem; }
+.btn-lg { padding: 0.85rem 2rem; font-size: 1rem; }
+
+/* USER AVATAR */
+.user-avatar-btn {
+  display: flex; align-items: center; gap: 0.6rem;
+  background: var(--primary-light);
+  border: none; cursor: pointer;
+  padding: 0.4rem 1rem 0.4rem 0.4rem;
+  border-radius: 50px; text-decoration: none;
+  color: var(--primary); font-weight: 600; font-size: 0.875rem;
+  transition: all 0.2s;
+}
+.user-avatar-btn:hover { background: #E0E7FF; }
+.user-avatar-btn img, .user-avatar-btn .avatar-circle {
+  width: 30px; height: 30px; border-radius: 50%;
+  object-fit: cover;
+}
+.avatar-circle {
+  background: var(--primary); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+}
+
+/* MESSAGES */
+.messages-container {
+  position: fixed; top: 80px; right: 1.5rem;
+  z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem;
+}
+.alert {
+  padding: 1rem 1.5rem; border-radius: var(--radius);
+  font-weight: 500; font-size: 0.875rem;
+  display: flex; align-items: center; gap: 0.75rem;
+  min-width: 280px; box-shadow: var(--shadow-md);
+  animation: slideIn 0.3s ease;
+}
+.alert-success { background: #ECFDF5; color: #065F46; border-left: 4px solid var(--green); }
+.alert-error { background: #FEF2F2; color: #991B1B; border-left: 4px solid var(--red); }
+.alert-info { background: var(--primary-light); color: var(--primary-dark); border-left: 4px solid var(--primary); }
+@keyframes slideIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* FOOTER */
+.footer {
+  background: var(--dark);
+  color: var(--gray-400);
+  padding: 4rem 2rem 2rem;
+  margin-top: 5rem;
+}
+.footer-inner { max-width: 1280px; margin: 0 auto; }
+.footer-grid {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 3rem; margin-bottom: 3rem;
+}
+.footer-brand .nav-logo { color: white; margin-bottom: 1rem; display: block; }
+.footer-brand p { font-size: 0.9rem; line-height: 1.8; max-width: 280px; }
+.footer-col h4 {
+  color: white; font-family: var(--font-display);
+  font-size: 0.95rem; font-weight: 700;
+  margin-bottom: 1.25rem; letter-spacing: 0.5px;
+}
+.footer-col a {
+  display: block; color: var(--gray-400);
+  text-decoration: none; font-size: 0.875rem;
+  padding: 0.3rem 0; transition: color 0.2s;
+}
+.footer-col a:hover { color: white; }
+.footer-bottom {
+  border-top: 1px solid var(--gray-700);
+  padding-top: 1.5rem;
+  display: flex; justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+/* UTILITIES */
+.container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
+.section { padding: 5rem 2rem; }
+.section-sm { padding: 3rem 2rem; }
+.badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.3rem 0.8rem; border-radius: 50px;
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px;
+}
+.badge-primary { background: var(--primary-light); color: var(--primary); }
+.badge-green { background: #ECFDF5; color: #065F46; }
+.badge-yellow { background: #FFFBEB; color: #92400E; }
+.badge-red { background: #FEF2F2; color: #991B1B; }
+
+.card {
+  background: white; border-radius: var(--radius);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  overflow: hidden; transition: all 0.3s;
+}
+.card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+.section-header { text-align: center; margin-bottom: 3rem; }
+.section-header .eyebrow {
+  font-size: 0.8rem; font-weight: 700; letter-spacing: 2px;
+  color: var(--primary); text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+.section-header h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 800; color: var(--dark); line-height: 1.2;
+}
+.section-header p {
+  color: var(--gray-600); font-size: 1.05rem;
+  max-width: 520px; margin: 1rem auto 0;
+}
+
+/* ROLE COLORS */
+.role-student { background: #EEF2FF; color: #4338CA; }
+.role-mentor { background: #ECFDF5; color: #065F46; }
+.role-curator { background: #FFFBEB; color: #92400E; }
+.role-admin { background: #FEF2F2; color: #991B1B; }
+
+{% block extra_styles %}{% endblock %}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="{% url 'home' %}" class="nav-logo">
+      <div class="nav-logo-icon">🎓</div>
+      Skill<span>Mate</span>
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'home' %}">Bosh sahifa</a>
+      <a href="{% url 'courses:list' %}">Kurslar</a>
+    </div>
+    <div class="nav-actions">
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard:home' %}" class="btn btn-outline btn-sm">
+          <i class="fas fa-th-large"></i> Dashboard
+        </a>
+        <a href="{% url 'accounts:profile' %}" class="user-avatar-btn">
+          {% if user.avatar %}
+            <img src="{{ user.avatar.url }}" alt="">
+          {% else %}
+            <div class="avatar-circle">{{ user.first_name|first|default:user.username|first|upper }}{{ user.last_name|first|upper }}</div>
+          {% endif %}
+          {{ user.get_full_name|default:user.username }}
+        </a>
+        <a href="{% url 'accounts:logout' %}" class="btn btn-sm" style="color:var(--gray-600);">
+          <i class="fas fa-sign-out-alt"></i>
+        </a>
+      {% else %}
+        <a href="{% url 'accounts:login' %}" class="btn btn-outline btn-sm">Kirish</a>
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-sm">Ro'yxatdan o'tish</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<!-- MESSAGES -->
+{% if messages %}
+<div class="messages-container">
+  {% for msg in messages %}
+  <div class="alert alert-{% if msg.tags %}{{ msg.tags }}{% else %}info{% endif %}">
+    <i class="fas fa-{% if msg.tags == 'success' %}check-circle{% elif msg.tags == 'error' %}exclamation-circle{% else %}info-circle{% endif %}"></i>
+    {{ msg }}
+  </div>
+  {% endfor %}
+</div>
+<script>
+setTimeout(() => {
+  document.querySelectorAll('.alert').forEach(el => {
+    el.style.animation = 'slideIn 0.3s ease reverse';
+    setTimeout(() => el.remove(), 300);
+  });
+}, 4000);
+</script>
+{% endif %}
+
+{% block content %}{% endblock %}
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="nav-logo" style="margin-bottom:1rem;">
+          <div class="nav-logo-icon">🎓</div>
+          Skill<span style="color:var(--gray-400)">Mate</span>
+        </a>
+        <p>O'zbekistondagi eng zamonaviy online ta'lim platformasi. Bilim olish, malaka oshirish va karyerangizni yuksaltirishga yordam beramiz.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Kurslar</h4>
+        <a href="/courses/?category=ingliz-tili">Ingliz tili</a>
+        <a href="/courses/?category=rus-tili">Rus tili</a>
+        <a href="/courses/?category=matematika">Matematika</a>
+        <a href="/courses/?category=fizika">Fizika</a>
+      </div>
+      <div class="footer-col">
+        <h4>Platforma</h4>
+        <a href="/">Bosh sahifa</a>
+        <a href="/courses/">Barcha kurslar</a>
+        <a href="/accounts/register/">Ro'yxatdan o'tish</a>
+        <a href="/accounts/login/">Kirish</a>
+      </div>
+      <div class="footer-col">
+        <h4>Bog'lanish</h4>
+        <a href="#"><i class="fab fa-telegram"></i> Telegram</a>
+        <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+        <a href="#"><i class="fas fa-envelope"></i> Email</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2024 SkillMate. Barcha huquqlar himoyalangan.</span>
+      <span>❤️ O'zbekistonda yaratilgan</span>
+    </div>
+  </div>
+</footer>
+
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

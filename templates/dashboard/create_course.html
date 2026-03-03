@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}Yangi kurs — SkillMate{% endblock %}
+{% block extra_styles %}
+.form-page { max-width: 800px; margin: 3rem auto; padding: 0 2rem; }
+.form-header { background: linear-gradient(135deg, var(--primary), #7C3AED); border-radius: 16px; padding: 2rem; color: white; margin-bottom: 2rem; }
+.form-header h1 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; }
+.form-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+.form-card h3 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 1.5rem; padding-bottom: 0.75rem; border-bottom: 2px solid var(--gray-100); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+.form-group { margin-bottom: 0; }
+.form-group.full { grid-column: span 2; }
+.form-label { display: block; font-weight: 600; font-size: 0.85rem; color: var(--gray-700); margin-bottom: 0.5rem; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 0.8rem 1rem; border: 2px solid var(--gray-200);
+  border-radius: 10px; font-family: var(--font-body); font-size: 0.9rem;
+  color: var(--dark); outline: none; transition: all 0.2s; background: white;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+.form-textarea { resize: vertical; min-height: 120px; }
+.checkbox-wrap { display: flex; align-items: center; gap: 0.75rem; padding: 0.8rem 1rem; border: 2px solid var(--gray-200); border-radius: 10px; cursor: pointer; }
+.checkbox-wrap input { width: 18px; height: 18px; cursor: pointer; }
+.actions-bar { display: flex; gap: 1rem; justify-content: flex-end; }
+{% endblock %}
+
+{% block content %}
+<div class="form-page">
+  <div class="form-header">
+    <h1>📚 Yangi Kurs Yaratish</h1>
+    <p style="color:rgba(255,255,255,0.75);margin-top:0.25rem;">Kurs ma'lumotlarini to'ldiring</p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-card">
+      <h3>📋 Asosiy ma'lumotlar</h3>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label class="form-label">Kurs nomi *</label>
+          <input type="text" name="title" class="form-input" placeholder="Masalan: Ingliz tili — Beginner" required>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Qisqa tavsif</label>
+          <input type="text" name="short_description" class="form-input" placeholder="1-2 jumlada kurs haqida...">
+        </div>
+        <div class="form-group full">
+          <label class="form-label">To'liq tavsif</label>
+          <textarea name="description" class="form-textarea" placeholder="Kurs haqida batafsil yozing..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kategoriya</label>
+          <select name="category" class="form-select">
+            <option value="">— Kategoriyasiz —</option>
+            {% for cat in categories %}
+              <option value="{{ cat.id }}">{{ cat.icon }} {{ cat.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Thumbnail rasm</label>
+          <input type="file" name="thumbnail" class="form-input" accept="image/*">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-card">
+      <h3>⚙️ Parametrlar</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Daraja</label>
+          <select name="level" class="form-select">
+            <option value="beginner">🌱 Boshlang'ich</option>
+            <option value="intermediate">🚀 O'rta</option>
+            <option value="advanced">⚡ Yuqori</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Til</label>
+          <select name="language" class="form-select">
+            <option value="uz">🇺🇿 O'zbek tili</option>
+            <option value="ru">🇷🇺 Rus tili</option>
+            <option value="en">🇬🇧 Ingliz tili</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Davomiyligi (soat)</label>
+          <input type="number" name="duration_hours" class="form-input" value="0" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Narx (so'm)</label>
+          <input type="number" name="price" class="form-input" value="0" min="0">
+        </div>
+        <div class="form-group full">
+          <label class="checkbox-wrap">
+            <input type="checkbox" name="is_free" checked>
+            <span><strong>Bepul kurs</strong> — Barcha foydalanuvchilar bepul kirishi mumkin</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    {% if user.role == 'curator' or user.is_staff %}
+    <div class="form-card">
+      <h3>👨‍🏫 O'qituvchi</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Mentor</label>
+          <select name="mentor" class="form-select">
+            <option value="">— Mentor tanlang —</option>
+            {% for mentor in mentors %}
+              <option value="{{ mentor.id }}">{{ mentor.get_full_name|default:mentor.username }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="actions-bar">
+      <a href="{% url 'dashboard:home' %}" class="btn btn-outline">Bekor qilish</a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-plus-circle"></i> Kurs yaratish
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

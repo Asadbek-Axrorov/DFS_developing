@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block title %}Mentor Dashboard — SkillMate{% endblock %}
+{% block extra_styles %}
+.dashboard { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+.dash-header { background: linear-gradient(135deg, #059669, #0D9488); border-radius: 20px; padding: 2.5rem; color: white; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
+.dash-header h1 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; margin-bottom: 2rem; }
+.stat-card { background: white; border-radius: 14px; padding: 1.5rem; box-shadow: var(--shadow); }
+.stat-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 0.75rem; }
+.stat-num { font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: var(--dark); }
+.stat-label { color: var(--gray-500); font-size: 0.8rem; }
+.courses-table { background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+.table-header { padding: 1.25rem 1.5rem; background: var(--gray-100); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--gray-200); }
+.table-header h3 { font-family: var(--font-display); font-weight: 700; color: var(--dark); }
+table { width: 100%; border-collapse: collapse; }
+thead th { padding: 0.85rem 1.5rem; text-align: left; font-size: 0.78rem; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; background: var(--gray-50); border-bottom: 1px solid var(--gray-200); }
+tbody td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--gray-100); font-size: 0.875rem; color: var(--gray-700); }
+tbody tr:hover { background: var(--gray-50); }
+tbody tr:last-child td { border-bottom: none; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 0.4rem; }
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+  <div class="dash-header">
+    <div>
+      <h1>👨‍🏫 Mentor Dashboard</h1>
+      <p style="color:rgba(255,255,255,0.75);">{{ user.get_full_name|default:user.username }} — Salom!</p>
+    </div>
+    <a href="{% url 'dashboard:create_course' %}" class="btn btn-white">
+      <i class="fas fa-plus"></i> Yangi kurs yaratish
+    </a>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#ECFDF5;">📚</div>
+      <div class="stat-num">{{ total_courses }}</div>
+      <div class="stat-label">Jami kurslar</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#EEF2FF;">✅</div>
+      <div class="stat-num">{{ published }}</div>
+      <div class="stat-label">Nashr etilgan</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#FFFBEB;">👥</div>
+      <div class="stat-num">{{ total_students }}</div>
+      <div class="stat-label">Talabalar</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:#FEF2F2;">🏆</div>
+      <div class="stat-num">4.8</div>
+      <div class="stat-label">O'rtacha reyting</div>
+    </div>
+  </div>
+
+  <div class="courses-table">
+    <div class="table-header">
+      <h3>Mening kurslarim</h3>
+      <a href="{% url 'dashboard:create_course' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Kurs qo'shish</a>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Kurs nomi</th>
+          <th>Holat</th>
+          <th>Talabalar</th>
+          <th>Daraja</th>
+          <th>Amallar</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for course in courses %}
+        <tr>
+          <td>
+            <div style="font-weight:600;color:var(--dark);">{{ course.title }}</div>
+            {% if course.category %}<div style="font-size:0.75rem;color:var(--gray-400);">{{ course.category.name }}</div>{% endif %}
+          </td>
+          <td>
+            {% if course.is_published %}
+              <span class="badge badge-green"><span class="status-dot" style="background:var(--green);"></span>Nashr</span>
+            {% else %}
+              <span class="badge" style="background:#F3F4F6;color:var(--gray-600);"><span class="status-dot" style="background:var(--gray-400);"></span>Qoralama</span>
+            {% endif %}
+          </td>
+          <td><strong>{{ course.students_count }}</strong></td>
+          <td><span class="badge badge-primary">{{ course.get_level_display }}</span></td>
+          <td>
+            <a href="{% url 'dashboard:edit_course' course.pk %}" class="btn btn-outline btn-sm">
+              <i class="fas fa-edit"></i> Tahrirlash
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" style="text-align:center;padding:3rem;color:var(--gray-400);">Hali kurs yo'q. <a href="{% url 'dashboard:create_course' %}">Yarating!</a></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

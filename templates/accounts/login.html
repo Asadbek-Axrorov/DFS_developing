@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Kirish — SkillMate{% endblock %}
+
+{% block extra_styles %}
+.auth-page {
+  min-height: calc(100vh - 70px);
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #F0F4FF 0%, #EDE9FE 100%);
+  padding: 2rem;
+}
+.auth-card {
+  background: white; border-radius: 24px;
+  padding: 3rem; width: 100%; max-width: 440px;
+  box-shadow: 0 20px 60px rgba(79,70,229,0.15);
+}
+.auth-logo {
+  text-align: center; margin-bottom: 2rem;
+}
+.auth-logo .icon {
+  width: 64px; height: 64px; background: var(--primary);
+  border-radius: 18px; margin: 0 auto 1rem;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2rem;
+}
+.auth-logo h1 {
+  font-family: var(--font-display); font-size: 1.5rem;
+  font-weight: 800; color: var(--dark);
+}
+.auth-logo p { color: var(--gray-600); font-size: 0.9rem; margin-top: 0.25rem; }
+.form-group { margin-bottom: 1.25rem; }
+.form-label {
+  display: block; font-weight: 600; font-size: 0.875rem;
+  color: var(--gray-700); margin-bottom: 0.5rem;
+}
+.form-input {
+  width: 100%; padding: 0.85rem 1rem;
+  border: 2px solid var(--gray-200);
+  border-radius: 12px; font-family: var(--font-body);
+  font-size: 0.95rem; color: var(--dark);
+  transition: all 0.2s; outline: none;
+}
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(79,70,229,0.1);
+}
+.form-input-icon { position: relative; }
+.form-input-icon .form-input { padding-left: 3rem; }
+.form-input-icon .icon {
+  position: absolute; left: 1rem; top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400); font-size: 1rem;
+}
+.btn-full { width: 100%; justify-content: center; padding: 0.9rem; font-size: 1rem; }
+.auth-footer {
+  text-align: center; margin-top: 1.5rem;
+  font-size: 0.875rem; color: var(--gray-600);
+}
+.auth-footer a { color: var(--primary); font-weight: 600; text-decoration: none; }
+.divider {
+  display: flex; align-items: center; gap: 1rem;
+  margin: 1.5rem 0; color: var(--gray-400); font-size: 0.8rem;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--gray-200);
+}
+{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="icon">🎓</div>
+      <h1>SkillMate</h1>
+      <p>Hisobingizga kiring</p>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
+        <label class="form-label">Foydalanuvchi nomi</label>
+        <div class="form-input-icon">
+          <i class="fas fa-user icon"></i>
+          <input type="text" name="username" class="form-input" placeholder="username" required autocomplete="username">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Parol</label>
+        <div class="form-input-icon">
+          <i class="fas fa-lock icon"></i>
+          <input type="password" name="password" class="form-input" placeholder="••••••••" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:0.5rem;">
+        <i class="fas fa-sign-in-alt"></i> Kirish
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      Hisobingiz yo'qmi? <a href="{% url 'accounts:register' %}">Ro'yxatdan o'ting</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

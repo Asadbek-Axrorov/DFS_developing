@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.title }} — Tahrirlash{% endblock %}
+{% block extra_styles %}
+.edit-page { max-width: 1100px; margin: 2rem auto; padding: 0 2rem; }
+.edit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.edit-header h1 { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: var(--dark); }
+.edit-grid { display: grid; grid-template-columns: 1fr 380px; gap: 2rem; }
+.card { background: white; border-radius: 16px; box-shadow: var(--shadow); margin-bottom: 1.5rem; overflow: hidden; }
+.card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; background: var(--gray-50); }
+.card-header h3 { font-family: var(--font-display); font-size: 0.95rem; font-weight: 700; color: var(--dark); }
+.card-body { padding: 1.5rem; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group { margin-bottom: 0; }
+.form-group.full { grid-column: span 2; }
+.form-label { display: block; font-weight: 600; font-size: 0.82rem; color: var(--gray-600); margin-bottom: 0.4rem; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; padding: 0.7rem 0.9rem; border: 2px solid var(--gray-200);
+  border-radius: 9px; font-family: var(--font-body); font-size: 0.875rem;
+  outline: none; transition: all 0.2s; background: white;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--primary); }
+.form-textarea { resize: vertical; min-height: 100px; }
+.module-item { border: 2px solid var(--gray-200); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; }
+.module-head {
+  background: var(--gray-100); padding: 1rem 1.25rem;
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer;
+}
+.module-head:hover { background: var(--primary-light); }
+.module-head-title { font-weight: 700; color: var(--dark); font-size: 0.9rem; }
+.module-body { padding: 0.75rem; }
+.lesson-row {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.7rem 0.9rem; border-radius: 8px;
+  transition: background 0.2s;
+}
+.lesson-row:hover { background: var(--gray-100); }
+.lesson-type-icon { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.lesson-name { flex: 1; font-size: 0.82rem; color: var(--gray-700); }
+.lesson-min { font-size: 0.72rem; color: var(--gray-400); }
+.add-lesson-form { background: var(--gray-50); border-radius: 10px; padding: 1rem; margin-top: 0.75rem; border: 2px dashed var(--gray-300); }
+.add-lesson-form h5 { font-size: 0.8rem; font-weight: 700; color: var(--gray-600); margin-bottom: 0.75rem; }
+.mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 0.6rem; }
+.mini-input, .mini-select {
+  padding: 0.5rem 0.75rem; border: 2px solid var(--gray-200);
+  border-radius: 8px; font-size: 0.8rem; outline: none;
+  background: white; transition: border-color 0.2s; width: 100%;
+}
+.mini-input:focus, .mini-select:focus { border-color: var(--primary); }
+.toggle-check { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--gray-600); margin: 0.5rem 0; }
+.delete-btn { color: var(--red); background: #FEF2F2; border: none; border-radius: 6px; padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; }
+.delete-btn:hover { background: var(--red); color: white; }
+.publish-toggle { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: var(--gray-50); border-radius: 10px; margin-bottom: 1rem; }
+{% endblock %}
+
+{% block content %}
+<div class="edit-page">
+  <div class="edit-header">
+    <div>
+      <div style="font-size:0.8rem;color:var(--gray-500);margin-bottom:0.25rem;">
+        <a href="{% url 'dashboard:home' %}" style="color:var(--primary);text-decoration:none;">Dashboard</a> / Kurs tahrirlash
+      </div>
+      <h1>✏️ {{ course.title }}</h1>
+    </div>
+    <div style="display:flex;gap:0.75rem;">
+      <a href="{% url 'courses:detail' course.slug %}" class="btn btn-outline btn-sm" target="_blank">
+        <i class="fas fa-eye"></i> Ko'rish
+      </a>
+    </div>
+  </div>
+
+  <div class="edit-grid">
+    <!-- LEFT: MODULES & LESSONS -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <h3>📚 Modullar va Darslar</h3>
+        </div>
+        <div class="card-body">
+          {% for module in modules %}
+          <div class="module-item">
+            <div class="module-head" onclick="toggleSection('mod-{{ module.id }}')">
+              <div style="display:flex;align-items:center;gap:0.6rem;">
+                <span style="font-size:1.2rem;">📁</span>
+                <span class="module-head-title">{{ module.title }}</span>
+                <span style="font-size:0.72rem;color:var(--gray-500);">{{ module.lessons.count }} dars</span>
+              </div>
+              <div style="display:flex;gap:0.5rem;">
+                <a href="{% url 'dashboard:delete_module' module.pk %}" class="delete-btn" onclick="return confirm('O\'chirishni tasdiqlaysizmi?')">
+                  <i class="fas fa-trash"></i>
+                </a>
+                <i class="fas fa-chevron-down" style="color:var(--gray-400);"></i>
+              </div>
+            </div>
+            <div class="module-body" id="mod-{{ module.id }}">
+              {% for lesson in module.lessons.all %}
+              <div class="lesson-row">
+                {% if lesson.lesson_type == 'video' %}
+                  <div class="lesson-type-icon" style="background:#EEF2FF;color:var(--primary);">🎬</div>
+                {% elif lesson.lesson_type == 'text' %}
+                  <div class="lesson-type-icon" style="background:#ECFDF5;color:var(--green);">📝</div>
+                {% elif lesson.lesson_type == 'quiz' %}
+                  <div class="lesson-type-icon" style="background:#FFFBEB;color:var(--accent);">❓</div>
+                {% else %}
+                  <div class="lesson-type-icon" style="background:#FEF2F2;color:var(--red);">✅</div>
+                {% endif %}
+                <div class="lesson-name">{{ lesson.title }}</div>
+                <div class="lesson-min">{{ lesson.duration_minutes }}m</div>
+                <a href="{% url 'dashboard:delete_lesson' lesson.pk %}" class="delete-btn" onclick="return confirm('Darsni o\'chirasizmi?')">
+                  <i class="fas fa-times"></i>
+                </a>
+              </div>
+              {% endfor %}
+
+              <!-- Add lesson form -->
+              <div style="margin-top:0.75rem;">
+                <button type="button" onclick="toggleSection('add-lesson-{{ module.id }}')" class="btn btn-outline btn-sm" style="width:100%;justify-content:center;">
+                  <i class="fas fa-plus"></i> Dars qo'shish
+                </button>
+              </div>
+              <div class="add-lesson-form" id="add-lesson-{{ module.id }}" style="display:none;">
+                <h5>➕ Yangi dars qo'shish</h5>
+                <form method="post" enctype="multipart/form-data">
+                  {% csrf_token %}
+                  <input type="hidden" name="action" value="add_lesson">
+                  <input type="hidden" name="module_id" value="{{ module.id }}">
+                  <input type="text" name="lesson_title" class="mini-input" placeholder="Dars nomi *" required style="width:100%;margin-bottom:0.6rem;">
+                  <div class="mini-grid">
+                    <select name="lesson_type" class="mini-select">
+                      <option value="video">🎬 Video dars</option>
+                      <option value="text">📝 Matn dars</option>
+                      <option value="quiz">❓ Test</option>
+                      <option value="task">✅ Vazifa</option>
+                    </select>
+                    <input type="number" name="duration_minutes" class="mini-input" placeholder="Davom (min)" min="0">
+                  </div>
+                  <input type="url" name="video_url" class="mini-input" placeholder="YouTube/Video URL (ixtiyoriy)" style="width:100%;margin-bottom:0.6rem;">
+                  <div style="margin-bottom:0.4rem;">
+                    <label style="font-size:0.75rem;color:var(--gray-600);">Yoki video fayl yuklang:</label>
+                    <input type="file" name="video_file" class="mini-input" accept="video/*" style="margin-top:0.3rem;">
+                  </div>
+                  <textarea name="content" class="mini-input" placeholder="Dars matni (ixtiyoriy)" style="min-height:70px;resize:vertical;"></textarea>
+                  <div class="toggle-check">
+                    <input type="checkbox" name="is_free_preview" id="free_{{ module.id }}">
+                    <label for="free_{{ module.id }}">Bepul ko'rinsin</label>
+                  </div>
+                  <button type="submit" class="btn btn-primary btn-sm" style="width:100%;justify-content:center;">
+                    <i class="fas fa-plus"></i> Saqlash
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <p style="color:var(--gray-400);text-align:center;padding:1rem;">Hali modul yo'q</p>
+          {% endfor %}
+
+          <!-- Add module -->
+          <div style="border: 2px dashed var(--gray-300); border-radius: 12px; padding: 1.25rem; margin-top: 0.5rem;">
+            <h4 style="font-size:0.875rem;font-weight:700;color:var(--gray-600);margin-bottom:0.75rem;">📁 Yangi modul qo'shish</h4>
+            <form method="post" style="display:flex;gap:0.75rem;">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="add_module">
+              <input type="text" name="module_title" class="form-input" placeholder="Modul nomi..." required style="flex:1;">
+              <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Qo'shish</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: COURSE SETTINGS -->
+    <div>
+      <div class="card">
+        <div class="card-header"><h3>⚙️ Kurs sozlamalari</h3></div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_course">
+
+            <div class="publish-toggle">
+              <div style="flex:1;">
+                <div style="font-weight:700;font-size:0.875rem;">Nashr holati</div>
+                <div style="font-size:0.75rem;color:var(--gray-500);">{% if course.is_published %}Kurs nashr etilgan{% else %}Kurs qoralama holatda{% endif %}</div>
+              </div>
+              <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+                <input type="checkbox" name="is_published" {% if course.is_published %}checked{% endif %} style="width:18px;height:18px;">
+                <span style="font-size:0.8rem;font-weight:600;">Nashr</span>
+              </label>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:0.9rem;">
+              <div>
+                <label class="form-label">Kurs nomi</label>
+                <input type="text" name="title" value="{{ course.title }}" class="form-input" required>
+              </div>
+              <div>
+                <label class="form-label">Qisqa tavsif</label>
+                <input type="text" name="short_description" value="{{ course.short_description }}" class="form-input">
+              </div>
+              <div>
+                <label class="form-label">Tavsif</label>
+                <textarea name="description" class="form-textarea">{{ course.description }}</textarea>
+              </div>
+              <div>
+                <label class="form-label">Kategoriya</label>
+                <select name="category" class="form-select">
+                  <option value="">— Tanlang —</option>
+                  {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if course.category_id == cat.id %}selected{% endif %}>{{ cat.icon }} {{ cat.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="mini-grid">
+                <div>
+                  <label class="form-label">Daraja</label>
+                  <select name="level" class="form-select">
+                    <option value="beginner" {% if course.level == 'beginner' %}selected{% endif %}>🌱 Boshlang'ich</option>
+                    <option value="intermediate" {% if course.level == 'intermediate' %}selected{% endif %}>🚀 O'rta</option>
+                    <option value="advanced" {% if course.level == 'advanced' %}selected{% endif %}>⚡ Yuqori</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Til</label>
+                  <select name="language" class="form-select">
+                    <option value="uz" {% if course.language == 'uz' %}selected{% endif %}>🇺🇿 O'zbek</option>
+                    <option value="ru" {% if course.language == 'ru' %}selected{% endif %}>🇷🇺 Rus</option>
+                    <option value="en" {% if course.language == 'en' %}selected{% endif %}>🇬🇧 Ingliz</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label class="form-label">Mentor</label>
+                <select name="mentor" class="form-select">
+                  <option value="">— Mentor tanlang —</option>
+                  {% for mentor in mentors %}
+                    <option value="{{ mentor.id }}" {% if course.mentor_id == mentor.id %}selected{% endif %}>{{ mentor.get_full_name|default:mentor.username }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Kurator</label>
+                <select name="curator" class="form-select">
+                  <option value="">— Kurator tanlang —</option>
+                  {% for curator in curators %}
+                    <option value="{{ curator.id }}" {% if course.curator_id == curator.id %}selected{% endif %}>{{ curator.get_full_name|default:curator.username }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Thumbnail</label>
+                <input type="file" name="thumbnail" class="form-input" accept="image/*">
+              </div>
+              <div class="mini-grid">
+                <div>
+                  <label class="form-label">Davomiyligi (soat)</label>
+                  <input type="number" name="duration_hours" value="{{ course.duration_hours }}" class="form-input" min="0">
+                </div>
+                <div>
+                  <label class="form-label">Narx</label>
+                  <input type="number" name="price" value="{{ course.price }}" class="form-input" min="0">
+                </div>
+              </div>
+              <label style="display:flex;align-items:center;gap:0.75rem;cursor:pointer;font-size:0.875rem;">
+                <input type="checkbox" name="is_free" {% if course.is_free %}checked{% endif %}>
+                <span><strong>Bepul kurs</strong></span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:1.5rem;">
+              <i class="fas fa-save"></i> Saqlash
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+// Open all modules by default
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('[id^="mod-"]').forEach(el => {
+    if (!el.id.includes('add-lesson')) el.style.display = 'block';
+  });
+});
+</script>
+{% endblock %}

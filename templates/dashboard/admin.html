@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard — SkillMate{% endblock %}
+{% block extra_styles %}
+.dashboard { max-width: 1280px; margin: 0 auto; padding: 2rem; }
+.dash-header { background: linear-gradient(135deg, #0F172A, #1E1B4B); border-radius: 20px; padding: 2.5rem; color: white; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; }
+.dash-header h1 { font-family: var(--font-display); font-size: 2rem; font-weight: 800; }
+.stats-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.stat-card { background: white; border-radius: 14px; padding: 1.25rem 1.5rem; box-shadow: var(--shadow); }
+.stat-icon { font-size: 1.3rem; margin-bottom: 0.5rem; }
+.stat-num { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: var(--dark); }
+.stat-label { color: var(--gray-500); font-size: 0.75rem; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.data-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); }
+.data-card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; background: var(--gray-50); }
+.data-card-header h3 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; }
+table { width: 100%; border-collapse: collapse; }
+th { padding: 0.7rem 1.25rem; font-size: 0.72rem; font-weight: 700; color: var(--gray-500); text-transform: uppercase; background: var(--gray-50); }
+td { padding: 0.9rem 1.25rem; border-top: 1px solid var(--gray-100); font-size: 0.85rem; }
+tr:hover td { background: var(--gray-50); }
+.role-badge { padding: 0.2rem 0.7rem; border-radius: 50px; font-size: 0.72rem; font-weight: 700; }
+{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+  <div class="dash-header">
+    <div>
+      <h1>⚡ Admin Panel</h1>
+      <p style="color:rgba(255,255,255,0.6);margin-top:0.25rem;">SkillMate boshqaruv paneli</p>
+    </div>
+    <div style="display:flex;gap:0.75rem;">
+      <a href="/admin/" class="btn btn-white">
+        <i class="fas fa-cog"></i> Django Admin
+      </a>
+      <a href="{% url 'dashboard:create_course' %}" class="btn" style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);">
+        <i class="fas fa-plus"></i> Kurs qo'shish
+      </a>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-num">{{ stats.total_students }}</div>
+      <div class="stat-label">Talabalar</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">👨‍🏫</div>
+      <div class="stat-num">{{ stats.total_mentors }}</div>
+      <div class="stat-label">Mentorlar</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-num">{{ stats.total_curators }}</div>
+      <div class="stat-label">Kuratorlar</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📚</div>
+      <div class="stat-num">{{ stats.total_courses }}</div>
+      <div class="stat-label">Jami kurslar</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-num">{{ stats.published_courses }}</div>
+      <div class="stat-label">Nashr</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-num">{{ stats.total_enrollments }}</div>
+      <div class="stat-label">Yozilishlar</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="data-card">
+      <div class="data-card-header">
+        <h3>👥 Yangi foydalanuvchilar</h3>
+        <a href="/admin/accounts/user/" class="btn btn-outline btn-sm">Barchasi</a>
+      </div>
+      <table>
+        <thead><tr><th>Foydalanuvchi</th><th>Rol</th><th>Sana</th></tr></thead>
+        <tbody>
+          {% for u in recent_users %}
+          <tr>
+            <td>
+              <div style="font-weight:600;">{{ u.get_full_name|default:u.username }}</div>
+              <div style="font-size:0.72rem;color:var(--gray-400);">{{ u.email }}</div>
+            </td>
+            <td>
+              <span class="role-badge role-{{ u.role }}">{{ u.get_role_display }}</span>
+            </td>
+            <td style="color:var(--gray-500);">{{ u.date_joined|date:"d.m.Y" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="data-card">
+      <div class="data-card-header">
+        <h3>📚 So'nggi kurslar</h3>
+        <a href="/admin/courses/course/" class="btn btn-outline btn-sm">Barchasi</a>
+      </div>
+      <table>
+        <thead><tr><th>Kurs</th><th>Holat</th><th>Amal</th></tr></thead>
+        <tbody>
+          {% for c in recent_courses %}
+          <tr>
+            <td>
+              <div style="font-weight:600;">{{ c.title }}</div>
+              {% if c.mentor %}<div style="font-size:0.72rem;color:var(--gray-400);">{{ c.mentor.get_full_name|default:c.mentor.username }}</div>{% endif %}
+            </td>
+            <td>
+              {% if c.is_published %}<span class="badge badge-green">Nashr</span>
+              {% else %}<span class="badge" style="background:#F3F4F6;color:#6B7280;">Qoralama</span>{% endif %}
+            </td>
+            <td><a href="{% url 'dashboard:edit_course' c.pk %}" class="btn btn-outline btn-sm">Tahrirlash</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
