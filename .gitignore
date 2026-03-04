@@ -1,7 +1,9 @@
-echo "venv/
+venv/
 *.pyc
 __pycache__/
 db.sqlite3
-media/
+media/*
+!media/.gitkeep
 staticfiles/
-.env" > .gitignore
+.env
+*.log
