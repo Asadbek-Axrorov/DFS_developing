@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block title %}Test natijasi — {{ quiz.title }}{% endblock %}
+
+{% block extra_styles %}
+.result-page { max-width: 820px; margin: 0 auto; padding: 2rem; }
+
+.result-hero {
+  border-radius: 24px; padding: 3rem;
+  text-align: center; margin-bottom: 2rem; position: relative; overflow: hidden;
+}
+.result-hero.passed {
+  background: linear-gradient(135deg, #059669, #0D9488);
+}
+.result-hero.failed {
+  background: linear-gradient(135deg, #DC2626, #9333EA);
+}
+.result-hero::before {
+  content: ''; position: absolute; top: -40%; right: -10%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1), transparent 70%);
+}
+.result-icon { font-size: 4rem; margin-bottom: 1rem; }
+.result-hero h1 { font-family: var(--font-display); font-size: 2rem; font-weight: 800; color: white; }
+.result-hero p { color: rgba(255,255,255,0.8); font-size: 1.05rem; margin-top: 0.5rem; }
+
+.score-circle {
+  width: 140px; height: 140px;
+  border-radius: 50%; border: 8px solid rgba(255,255,255,0.3);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  margin: 1.5rem auto;
+  background: rgba(255,255,255,0.15);
+}
+.score-pct { font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; color: white; }
+.score-label { color: rgba(255,255,255,0.7); font-size: 0.8rem; }
+
+.stats-row {
+  display: flex; justify-content: center; gap: 2rem;
+  margin-top: 1.5rem; flex-wrap: wrap;
+}
+.stat-item { text-align: center; }
+.stat-val { font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: white; }
+.stat-lbl { color: rgba(255,255,255,0.7); font-size: 0.8rem; margin-top: 0.2rem; }
+
+.answers-section { margin-top: 0; }
+.answer-card {
+  background: white; border-radius: 16px; padding: 1.75rem;
+  margin-bottom: 1.25rem; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  border-left: 4px solid #E5E7EB;
+}
+.answer-card.correct { border-left-color: #10B981; }
+.answer-card.wrong { border-left-color: #EF4444; }
+.answer-card.skipped { border-left-color: #F59E0B; }
+
+.answer-status {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.25rem 0.85rem; border-radius: 50px;
+  font-size: 0.75rem; font-weight: 700; margin-bottom: 1rem;
+}
+.status-correct { background: #ECFDF5; color: #065F46; }
+.status-wrong { background: #FEF2F2; color: #991B1B; }
+.status-skipped { background: #FFFBEB; color: #92400E; }
+
+.q-text { font-size: 1rem; font-weight: 600; color: #111827; margin-bottom: 1.25rem; line-height: 1.5; }
+
+.choices-review { display: flex; flex-direction: column; gap: 0.5rem; }
+.choice-review {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem 1rem; border-radius: 10px;
+  font-size: 0.875rem; border: 2px solid #E5E7EB;
+}
+.choice-review.is-correct { background: #ECFDF5; border-color: #10B981; }
+.choice-review.is-wrong-selected { background: #FEF2F2; border-color: #EF4444; }
+.choice-review.is-selected { border-color: #4F46E5; background: #EEF2FF; }
+
+.choice-icon { font-size: 1rem; flex-shrink: 0; }
+.choice-review-letter {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 700; flex-shrink: 0;
+  background: #F3F4F6; color: #6B7280;
+}
+.choice-review.is-correct .choice-review-letter { background: #10B981; color: white; }
+.choice-review.is-wrong-selected .choice-review-letter { background: #EF4444; color: white; }
+
+.explanation-box {
+  background: #EEF2FF; border-radius: 10px;
+  padding: 0.85rem 1rem; margin-top: 1rem;
+  font-size: 0.875rem; color: #4338CA; line-height: 1.6;
+}
+.explanation-box strong { display: block; margin-bottom: 0.25rem; }
+
+.action-btns { display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap; }
+{% endblock %}
+
+{% block content %}
+<div class="result-page">
+
+  <div class="result-hero {% if attempt.is_passed %}passed{% else %}failed{% endif %}">
+    <div class="result-icon">
+      {% if attempt.is_passed %}🏆{% else %}💪{% endif %}
+    </div>
+    <h1>{% if attempt.is_passed %}Tabriklaymiz!{% else %}Qayta urinib ko'ring!{% endif %}</h1>
+    <p>{% if attempt.is_passed %}Test muvaffaqiyatli topshirildi!{% else %}O'tish uchun {{ attempt.quiz.pass_percentage }}% kerak edi{% endif %}</p>
+
+    <div class="score-circle">
+      <div class="score-pct">{{ attempt.percentage|floatformat:0 }}%</div>
+      <div class="score-label">natija</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-val">{{ attempt.score|floatformat:0 }}/{{ attempt.total_points }}</div>
+        <div class="stat-lbl">Ball</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val">{{ answers|length }}</div>
+        <div class="stat-lbl">Javob berildi</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val">{{ attempt.quiz.pass_percentage }}%</div>
+        <div class="stat-lbl">O'tish chegarasi</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVOBLAR SHARHI -->
+  <h2 style="font-family:var(--font-display);font-size:1.2rem;font-weight:800;margin-bottom:1.5rem;color:#111827;">
+    📋 Javoblar sharhi
+  </h2>
+
+  <div class="answers-section">
+    {% for answer in answers %}
+    <div class="answer-card {% if answer.is_correct %}correct{% elif answer.selected_choice %}wrong{% else %}skipped{% endif %}">
+
+      {% if answer.is_correct %}
+        <span class="answer-status status-correct">✅ To'g'ri javob</span>
+      {% elif answer.selected_choice %}
+        <span class="answer-status status-wrong">❌ Noto'g'ri javob</span>
+      {% else %}
+        <span class="answer-status status-skipped">⚪ Javob berilmadi</span>
+      {% endif %}
+
+      <div class="q-text">{{ forloop.counter }}. {{ answer.question.text }}</div>
+
+      <div class="choices-review">
+        {% for choice in answer.question.choices.all %}
+        <div class="choice-review
+          {% if choice.is_correct %}is-correct
+          {% elif answer.selected_choice and answer.selected_choice.id == choice.id and not choice.is_correct %}is-wrong-selected
+          {% elif answer.selected_choice and answer.selected_choice.id == choice.id %}is-selected
+          {% endif %}">
+
+          <div class="choice-review-letter">
+            {% if forloop.counter == 1 %}A
+            {% elif forloop.counter == 2 %}B
+            {% elif forloop.counter == 3 %}C
+            {% else %}D{% endif %}
+          </div>
+          <div style="flex:1;font-size:0.875rem;">{{ choice.text }}</div>
+
+          {% if choice.is_correct %}
+            <span style="color:#059669;font-size:1rem;">✅</span>
+          {% elif answer.selected_choice and answer.selected_choice.id == choice.id and not choice.is_correct %}
+            <span style="color:#EF4444;font-size:1rem;">❌</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if answer.question.explanation %}
+      <div class="explanation-box">
+        <strong>💡 Izoh:</strong>
+        {{ answer.question.explanation }}
+      </div>
+      {% endif %}
+
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="action-btns">
+    <a href="{% url 'lms:course' course.slug %}" class="btn btn-outline">
+      ← Kursga qaytish
+    </a>
+    {% if attempt.quiz.max_attempts == 0 or attempt.quiz.attempts.filter(student=request.user).count < attempt.quiz.max_attempts %}
+      <a href="{% url 'lms:quiz_start' attempt.quiz.id %}" class="btn btn-primary">
+        🔄 Qayta urinish
+      </a>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
